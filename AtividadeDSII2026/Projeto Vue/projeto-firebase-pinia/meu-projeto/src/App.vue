@@ -17,7 +17,7 @@ const logout = async () => {
 <template>
   <div class="layout">
     <header class="topbar">
-      <h2><i class="fa-solid fa-fire"></i> Vue + Firebase</h2>
+      <img src="./assets/EcoLista.png" alt="Logo" width="100" height="90" />
       <span class="muted">Usuário: {{ userEmail }}</span>
     </header>
 

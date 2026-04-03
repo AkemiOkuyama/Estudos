@@ -15,9 +15,7 @@ const irParaPerfil = () => router.push('/profile')
 
 <template>
   <section class="card">
-    <h1><i class="fa-solid fa-house"></i> Início</h1>
-
-    <p>Este projeto mostra Pinia + Router + Firebase.</p>
+    <h1><i class="fa-solid fa-house"></i> Página Inicial</h1>
 
     <p>
       <strong>Status:</strong>
@@ -35,12 +33,12 @@ const irParaPerfil = () => router.push('/profile')
       </button>
 
       <button v-if="authStore.user" @click="irParaPerfil">
-        <i class="fa-solid fa-user"></i> Perfil
+        <i class="fa-solid fa-user"></i> Meu perfil
       </button>
     </div>
 
     <p class="muted">
-      Dica: tente acessar o Dashboard sem logar para ver a guarda em ação.
+      O conteúdo deste projeto foi desenvolvido com base na proposta do aplicativo EcoLista, idealizado como tema de TCC. A aplicação serve como referência para a construção das funcionalidades, design e objetivos apresentados na plataforma.
     </p>
   </section>
 </template>

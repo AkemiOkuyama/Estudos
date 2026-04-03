@@ -64,8 +64,8 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="card">
-    <h1><i class="fa-solid fa-chart-line"></i> Dashboard</h1>
-    <p class="muted">Somente usuários logados podem acessar esta tela.</p>
+    <h1><i class="fa-solid fa-chart-line"></i> Adicione itens</h1>
+    <p class="muted">Escreva abaixo os itens que deseja adicionar à sua lista de compras.</p>
 
     <div class="form-row">
       <input v-model="descricao" placeholder="Descrição (ex: Arroz)" />
@@ -79,7 +79,7 @@ onBeforeUnmount(() => {
       <i class="fa-solid fa-triangle-exclamation"></i> {{ aviso }}
     </p>
 
-    <h3>Minha lista:</h3>
+    <h3>Minha lista de compras:</h3>
 
     <ul v-if="despesas.length">
       <li 

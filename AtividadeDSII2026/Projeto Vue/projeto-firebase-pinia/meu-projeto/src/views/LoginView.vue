@@ -18,7 +18,7 @@ const tratarErro = (e) => {
     return 'Usuário não encontrado.'
   }
   if (e.code === 'auth/wrong-password') {
-    return 'Senha incorreta.'
+    return 'Senha incorreta, tente novamente.'
   }
   if (e.code === 'auth/email-already-in-use') {
     return 'Este email já está cadastrado.'
@@ -34,7 +34,7 @@ const tratarErro = (e) => {
 
 const validarCampos = () => {
   if (!email.value || !senha.value) {
-    erro.value = 'Preencha email e senha.'
+    erro.value = 'Preencha com o email e senha corretamente.'
     return false
   }
   return true
@@ -70,7 +70,7 @@ const registrar = async () => {
 <template>
   <section class="card">
     <h1><i class="fa-solid fa-right-to-bracket"></i> Login</h1>
-    <p class="muted">Use email e senha para testar o Firebase Auth.</p>
+    <p class="muted">Digite o seu e-mail e senha para acessar sua conta.</p>
 
     <label class="field">
       Email
