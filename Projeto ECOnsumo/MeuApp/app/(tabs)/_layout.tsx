@@ -17,18 +17,28 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Painel 🌱',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'leaf' : 'leaf-outline'} size={24} color={color} />
-          ),
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'leaf' : 'leaf-outline'} size={22} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="graficos"
+        options={{
+          title: 'Gráficos 📊',
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'bar-chart' : 'bar-chart-outline'} size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Novo Aparelho 🔌',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'add-circle' : 'add-circle-outline'} size={24} color={color} />
-          ),
+          title: 'Novo Aparelho',
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'add-circle' : 'add-circle-outline'} size={22} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="pontos"
+        options={{
+          title: 'Pontos 🪙',
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'trophy' : 'trophy-outline'} size={22} color={color} />,
         }}
       />
     </Tabs>
