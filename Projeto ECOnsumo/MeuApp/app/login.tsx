@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, ActivityIndicator } from 'react-native';
-import { auth } from '../firebaseConfig';
+import { auth, db } from '../firebaseConfig'; 
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore'; 
 import { useRouter } from 'expo-router';
 
 export default function LoginScreen() {
@@ -15,10 +16,27 @@ export default function LoginScreen() {
       Alert.alert('Erro', 'Preencha todos os campos!');
       return;
     }
+    
     setCarregando(true);
     try {
-      await signInWithEmailAndPassword(auth, email, senha);
+      const resultadoAuth = await signInWithEmailAndPassword(auth, email, senha);
+      const uid = resultadoAuth.user.uid;
+
+      const docRef = doc(db, 'users', uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const dadosUsuario = docSnap.data();
+        if (dadosUsuario.role === 'admin') {
+          router.replace('/(tabs)/admin');
+        } else {
+          router.replace('/(tabs)');
+        }
+      } else {
+        router.replace('/(tabs)');
+      }
     } catch (error: any) {
+      console.error("Erro no login:", error);
       Alert.alert('Erro no Login', 'E-mail ou senha incorretos.');
     } finally {
       setCarregando(false);
@@ -27,8 +45,8 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>🌱 ECOnsumo</Text>
-      <Text style={styles.subtitulo}>Faça login para continuar</Text>
+      <Text style={styles.logo}>🌱 ECOnsumo </Text>
+      <Text style={styles.subtitulo}>O futuro é consciente, o consumo é inteligente. Faça login para continuar</Text>
 
       <TextInput style={styles.input} placeholder="E-mail" placeholderTextColor="#888" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
       <TextInput style={styles.input} placeholder="Senha" placeholderTextColor="#888" secureTextEntry value={senha} onChangeText={setSenha} />

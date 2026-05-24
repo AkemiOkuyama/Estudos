@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, ActivityIndicator } from 'react-native';
-import { auth, db } from '../../firebaseConfig';
+import { auth, db } from '../firebaseConfig'; 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
@@ -17,16 +17,36 @@ export default function RegisterScreen() {
       Alert.alert('Erro', 'Preencha todos os campos!');
       return;
     }
+    if (senha.length < 6) {
+      Alert.alert('Erro', 'A senha precisa ter pelo menos 6 caracteres.');
+      return;
+    }
+
     setCarregando(true);
     try {
-      const res = await createUserWithEmailAndPassword(auth, email, senha);
-      await setDoc(doc(db, 'users', res.user.uid), {
+      const resultadoAuth = await createUserWithEmailAndPassword(auth, email, senha);
+  
+      await setDoc(doc(db, 'users', resultadoAuth.user.uid), {
         email: email,
-        role: role,
+        role: role, 
+        pontosTotais: 50,
         criadoEm: new Date()
       });
-      Alert.alert('Sucesso 🎉', 'Conta criada!');
+
+      Alert.alert('Sucesso 🎉', 'Conta criada! Você ganhou +50 XP de boas-vindas!', [
+        { 
+          text: 'Entrar', 
+          onPress: () => {
+            if (role === 'admin') {
+              router.replace('/(tabs)/admin'); 
+            } else {
+              router.replace('/(tabs)'); 
+            }
+          } 
+        }
+      ]);
     } catch (error: any) {
+      console.error("Erro completo:", error);
       Alert.alert('Erro ao cadastrar', error.message);
     } finally {
       setCarregando(false);
@@ -53,7 +73,7 @@ export default function RegisterScreen() {
         {carregando ? <ActivityIndicator color="#fff" /> : <Text style={styles.botaoTexto}>Cadastrar</Text>}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.back()} style={styles.link}>
+      <TouchableOpacity onPress={() => router.replace('/login')} style={styles.link}>
         <Text style={styles.linkTexto}>Já tem conta? Voltar ao Login</Text>
       </TouchableOpacity>
     </View>
@@ -71,5 +91,5 @@ const styles = StyleSheet.create({
   botao: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 8, alignItems: 'center', height: 55, justifyContent: 'center' },
   botaoTexto: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
   link: { marginTop: 25 },
-  linkTexto: { color: '#aaa', textAlign: 'center' }
+  linkTexto: { color: '#4CAF50', textAlign: 'center', fontSize: 15 }
 });
