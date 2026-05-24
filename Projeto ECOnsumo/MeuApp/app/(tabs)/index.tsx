@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { auth, db } from '../../firebaseConfig';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 export default function DashboardScreen() {
   const [totalKwh, setTotalKwh] = useState(0);
   const [carregando, setCarregando] = useState(true);
+  const router = useRouter();
+
   const TARIFA_KWH = 0.85; 
 
   useEffect(() => {
@@ -39,8 +43,18 @@ export default function DashboardScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.titulo}>Seu Painel 🌱</Text>
-        <TouchableOpacity onPress={() => signOut(auth)}><Text style={styles.sair}>Sair</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => signOut(auth)}>
+          <Text style={styles.sair}>Sair</Text>
+        </TouchableOpacity>
       </View>
+      
+      <TouchableOpacity 
+        style={styles.botaoMapa} 
+        onPress={() => router.push('/mapa')}
+      >
+        <Ionicons name="map" size={20} color="#fff" />
+        <Text style={styles.textoBotaoMapa}>Ver Pontos de Descarte</Text>
+      </TouchableOpacity>
       
       {carregando ? (
         <View style={[styles.cardResumo, { justifyContent: 'center', alignItems: 'center', height: 120 }]}>
@@ -62,7 +76,14 @@ export default function DashboardScreen() {
           return (
             <View key={index} style={styles.barraColuna}>
               <View style={styles.barraFundo}>
-                <View style={[ styles.barraProgresso, { height: `${alturaBarra}%` }, index === meses.length - 1 && { backgroundColor: '#4CAF50' }, index !== meses.length - 1 && { backgroundColor: '#81C784' } ]} />
+                <View 
+                  style={[
+                    styles.barraProgresso, 
+                    { height: `${alturaBarra}%` },
+                    index === meses.length - 1 && { backgroundColor: '#4CAF50' },
+                    index !== meses.length - 1 && { backgroundColor: '#81C784' } 
+                  ]} 
+                />
               </View>
               <Text style={styles.barraTexto}>{mes.nome}</Text>
             </View>
@@ -79,6 +100,23 @@ const styles = StyleSheet.create({
   titulo: { fontSize: 26, fontWeight: 'bold', color: '#fff', marginVertical: 15 },
   sair: { color: '#d32f2f', fontWeight: 'bold', padding: 5 },
   subtitulo: { fontSize: 18, fontWeight: 'bold', color: '#ccc', marginVertical: 15 },
+  botaoMapa: { 
+    backgroundColor: '#333', 
+    padding: 15, 
+    borderRadius: 10, 
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#4CAF50'
+  },
+  textoBotaoMapa: { 
+    color: '#fff', 
+    fontSize: 16, 
+    fontWeight: 'bold', 
+    marginLeft: 8 
+  },
   cardResumo: { backgroundColor: '#1E1E1E', padding: 20, borderRadius: 12, borderLeftWidth: 5, borderLeftColor: '#4CAF50', marginBottom: 20 },
   cardLabels: { color: '#aaa', fontSize: 14 },
   cardValor: { color: '#fff', fontSize: 36, fontWeight: 'bold', marginVertical: 5 },

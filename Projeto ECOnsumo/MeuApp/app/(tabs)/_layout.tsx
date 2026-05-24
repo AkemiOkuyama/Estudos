@@ -1,8 +1,8 @@
-import { Tabs } from 'expo-router';
-import React, { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { auth, db } from '../../firebaseConfig';
+import { Tabs } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { auth, db } from '../../firebaseConfig';
 
 export default function TabLayout() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -40,6 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen name="pontos" options={{ title: 'Pontos', tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'trophy' : 'trophy-outline'} size={22} color={color} /> }} />
       <Tabs.Screen name="admin" options={{ href: isAdmin ? undefined : null, title: 'Admin', tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'settings' : 'settings-outline'} size={22} color={color} /> }} />
       <Tabs.Screen name="register" options={{ title: 'Registro', tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'person' : 'person-outline'} size={22} color={color} /> }} />
+      <Tabs.Screen name="mapa" options={{ title: 'Mapa', tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'map' : 'map-outline'} size={22} color={color} /> }} />
     </Tabs>
   );
 }
