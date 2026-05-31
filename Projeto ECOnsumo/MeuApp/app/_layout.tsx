@@ -3,6 +3,7 @@ import { Slot, useRouter, useSegments } from 'expo-router';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import { View, ActivityIndicator } from 'react-native';
+import { NotificationProvider } from '../context/NotificationContext';
 
 export default function RootLayout() {
   const [initializing, setInitializing] = useState(true);
@@ -13,20 +14,20 @@ export default function RootLayout() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (initializing) setInitializing(false);
+      setInitializing(false);
     });
     return unsubscribe;
-  }, [initializing]);
+  }, []);
 
   useEffect(() => {
     if (initializing) return;
 
     const inAuthGroup = segments[0] === 'login' || segments[0] === 'register';
 
-    if (!user) {
-      if (!inAuthGroup) router.replace('/login');
-    } else {
-      if (inAuthGroup) router.replace('/(tabs)');
+    if (!user && !inAuthGroup) {
+      router.replace('/login');
+    } else if (user && inAuthGroup) {
+      router.replace('/(tabs)');
     }
   }, [user, segments, initializing]);
 
@@ -38,5 +39,9 @@ export default function RootLayout() {
     );
   }
 
-  return <Slot />;
+  return (
+    <NotificationProvider>
+      <Slot />
+    </NotificationProvider>
+  );
 }

@@ -29,10 +29,9 @@ const userDisplay = computed(() => authStore.user?.email.split('@')[0] || 'Usuá
         
         <div class="nav-links">
           <router-link to="/">Início</router-link> 
-          
           <router-link to="/cart">Loja</router-link>
-          <router-link v-if="authStore.user" to="/dashboard">Listas</router-link>
-          <router-link v-if="authStore.user" to="/admin/produtos">Cadastro</router-link>
+          <router-link v-if="authStore.user" to="/dashboard">Dashboard</router-link>
+          <router-link v-if="authStore.user" to="/admin/produtos">Gerenciar</router-link>
         </div>
 
         <div class="nav-actions">
@@ -78,4 +77,10 @@ const userDisplay = computed(() => authStore.user?.email.split('@')[0] || 'Usuá
 .btn-exit { background: #fff5f5; color: var(--danger); padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #ffebeb; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: 0.2s; }
 .btn-exit:hover { background: var(--danger); color: white; }
 .btn-login { background: var(--primary); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+
+@media (max-width: 768px) {
+  .nav-container { height: auto; padding: 15px 20px; flex-direction: column; gap: 12px; }
+  .nav-links { gap: 15px; width: 100%; justify-content: center; flex-wrap: wrap; }
+  .nav-actions { width: 100%; justify-content: center; gap: 20px; border-top: 1px solid var(--border); padding-top: 10px; }
+}
 </style>

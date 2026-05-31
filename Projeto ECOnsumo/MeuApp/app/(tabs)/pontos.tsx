@@ -1,7 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { auth, db } from '../../firebaseConfig';
 import { doc, onSnapshot } from 'firebase/firestore';
+
+const MISSOES = [
+  { id: '1', titulo: 'Primeiro Aparelho', desc: 'Cadastre eletrodomésticos para monitorar o consumo.', recompensa: '+50 XP / item' },
+  { id: '2', titulo: 'Meta de Consumo', desc: 'Fique abaixo de 100 kWh no fechamento do mês.', recompensa: '+500 XP / mês' },
+];
 
 export default function PointsScreen() {
   const [pontos, setPontos] = useState(0);
@@ -9,29 +14,32 @@ export default function PointsScreen() {
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
+
     const unsubscribe = onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
-      if (docSnap.exists()) setPontos(docSnap.data().pontosTotais || 0);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setPontos(data.pontosTotais || 0);
+      }
     });
+
     return () => unsubscribe();
   }, []);
 
-  const missoes = [
-    { id: '1', titulo: 'Primeiro Aparelho', desc: 'Cadastre eletrodomésticos para monitorar o consumo.', recompensa: '+50 XP / item' },
-    { id: '2', titulo: 'Meta de Consumo', desc: 'Fique abaixo de 100 kWh no fechamento do mês.', recompensa: '+500 XP / mês' },
-  ];
-
-  const valorDesconto = (pontos * 0.05).toFixed(2).replace('.', ',');
+  const valorDesconto = useMemo(() => (pontos * 0.05).toFixed(2).replace('.', ','), [pontos]);
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.titulo}>EcoPontos 🪙</Text>
+      
       <View style={styles.cardPontuacao}>
         <Text style={styles.labelTotal}>Seu Saldo Atual</Text>
         <Text style={styles.pontosTotal}>{pontos} XP</Text>
         <Text style={styles.subTotal}>Equivale a R$ {valorDesconto} em descontos!</Text>
       </View>
+
       <Text style={styles.sessaoTitulo}>Guia de Missões</Text>
-      {missoes.map((item) => (
+      
+      {MISSOES.map((item) => (
         <View key={item.id} style={styles.cardConquista}>
           <View style={{ flex: 1 }}>
             <Text style={styles.conquistaTitulo}>{item.titulo}</Text>

@@ -1,7 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { auth, db } from '../../firebaseConfig';
 import { collection, query, where, onSnapshot, doc, setDoc, increment } from 'firebase/firestore';
+
+const BarraConsumo = ({ setor, kwh, cor, percentual }: { setor: string, kwh: number, cor: string, percentual: number }) => (
+  <View style={styles.itemLinha}>
+    <View style={styles.labelContainer}>
+      <Text style={styles.nomeSetor}>{setor}</Text>
+      <Text style={styles.valorSetor}>{kwh} kWh</Text>
+    </View>
+    <View style={styles.barraFundo}>
+      <View style={[styles.barraProgresso, { width: `${percentual}%`, backgroundColor: cor }]} />
+    </View>
+  </View>
+);
 
 export default function ChartsScreen() {
   const [dados, setDados] = useState<any[]>([]);
@@ -10,7 +22,7 @@ export default function ChartsScreen() {
   const [resgatando, setResgatando] = useState(false);
   const [metaResgatada, setMetaResgatada] = useState(false);
 
-  const META_MENSAL = 100; 
+  const META_MENSAL = 100;
   const cores = ['#4CAF50', '#FF9800', '#E91E63', '#00BCD4', '#9C27B0', '#F44336'];
 
   useEffect(() => {
@@ -20,15 +32,15 @@ export default function ChartsScreen() {
     const q = query(collection(db, 'eletrodomesticos'), where('userId', '==', user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       let somaTotal = 0;
-      const listaFormatada: any[] = [];
-      let corIndex = 0;
-
-      snapshot.forEach((docSnap) => {
+      const listaFormatada = snapshot.docs.map((docSnap, index) => {
         const item = docSnap.data();
         const kwhMensal = (item.potenciaWatts * item.horasPorDia * 30) / 1000;
         somaTotal += kwhMensal;
-        listaFormatada.push({ setor: item.nome, kwh: Number(kwhMensal.toFixed(1)), cor: cores[corIndex % cores.length] });
-        corIndex++;
+        return { 
+          setor: item.nome, 
+          kwh: Number(kwhMensal.toFixed(1)), 
+          cor: cores[index % cores.length] 
+        };
       });
 
       listaFormatada.sort((a, b) => b.kwh - a.kwh);
@@ -40,7 +52,7 @@ export default function ChartsScreen() {
     return () => unsubscribe();
   }, []);
 
-  const maiorConsumo = dados.length > 0 ? dados[0].kwh : 1;
+  const maiorConsumo = useMemo(() => Math.max(...dados.map(d => d.kwh), 1), [dados]);
 
   const resgatarRecompensa = async () => {
     setResgatando(true);
@@ -48,16 +60,10 @@ export default function ChartsScreen() {
       const user = auth.currentUser;
       if (!user) return;
 
-      const userRef = doc(db, 'users', user.uid);
-
-      await setDoc(userRef, {
-        pontosTotais: increment(500)
-      }, { merge: true });
-
+      await setDoc(doc(db, 'users', user.uid), { pontosTotais: increment(500) }, { merge: true });
       setMetaResgatada(true);
       Alert.alert('🏆 Sucesso!', 'Você manteve o consumo sob controle e ganhou +500 XP!');
-    } catch (error: any) {
-      console.log("Erro ao resgatar:", error);
+    } catch (error) {
       Alert.alert('Erro', 'Não foi possível resgatar a recompensa.');
     } finally {
       setResgatando(false);
@@ -72,25 +78,39 @@ export default function ChartsScreen() {
       <Text style={styles.subtitulo}>Distribuição de gastos por eletrodoméstico (Mensal)</Text>
 
       <View style={styles.cardGrafico}>
-        {dados.length === 0 ? <Text style={{ color: '#aaa', textAlign: 'center' }}>Nenhum aparelho cadastrado.</Text> : dados.map((item, index) => (
-          <View key={index} style={styles.itemLinha}>
-            <View style={styles.labelContainer}><Text style={styles.nomeSetor}>{item.setor}</Text><Text style={styles.valorSetor}>{item.kwh} kWh</Text></View>
-            <View style={styles.barraFundo}><View style={[styles.barraProgresso, { width: `${(item.kwh / maiorConsumo) * 100}%`, backgroundColor: item.cor }]} /></View>
-          </View>
-        ))}
+        {dados.length === 0 ? (
+          <Text style={{ color: '#aaa', textAlign: 'center' }}>Nenhum aparelho cadastrado.</Text>
+        ) : (
+          dados.map((item, index) => (
+            <BarraConsumo 
+              key={index} 
+              {...item} 
+              percentual={(item.kwh / maiorConsumo) * 100} 
+            />
+          ))
+        )}
       </View>
 
       <View style={styles.divisor} />
+      
       <Text style={styles.tituloSecao}>Desafio do Mês 🎯</Text>
       <View style={styles.cardGamificacao}>
         <Text style={styles.metaTexto}>Meta: Manter consumo abaixo de {META_MENSAL} kWh</Text>
         <Text style={styles.totalTexto}>Consumo atual: <Text style={{ color: totalKwh > META_MENSAL ? '#F44336' : '#4CAF50' }}>{totalKwh} kWh</Text></Text>
         
-        {totalKwh === 0 ? <Text style={styles.avisoTexto}>Cadastre aparelhos para participar.</Text> : totalKwh <= META_MENSAL ? (
-          <TouchableOpacity style={[styles.botaoResgatar, metaResgatada && styles.botaoDesativado]} onPress={resgatarRecompensa} disabled={metaResgatada || resgatando}>
+        {totalKwh > 0 && totalKwh <= META_MENSAL ? (
+          <TouchableOpacity 
+            style={[styles.botaoResgatar, (metaResgatada || resgatando) && styles.botaoDesativado]} 
+            onPress={resgatarRecompensa} 
+            disabled={metaResgatada || resgatando}
+          >
             {resgatando ? <ActivityIndicator color="#fff" /> : <Text style={styles.botaoTexto}>{metaResgatada ? 'Resgatada (500 XP) ✅' : 'Resgatar +500 XP 🎉'}</Text>}
           </TouchableOpacity>
-        ) : <View style={styles.cardFalha}><Text style={styles.falhaTexto}>Consumo alto! Reduza para tentar novamente.</Text></View>}
+        ) : totalKwh > META_MENSAL ? (
+          <View style={styles.cardFalha}>
+            <Text style={styles.falhaTexto}>Consumo alto! Reduza para tentar novamente.</Text>
+          </View>
+        ) : <Text style={styles.avisoTexto}>Cadastre aparelhos para participar.</Text>}
       </View>
     </ScrollView>
   );
