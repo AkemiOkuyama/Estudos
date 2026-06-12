@@ -1,0 +1,69 @@
+:root {
+  --primary: #6c28d9e1;
+  --primary-dark: #6c28d9b7;
+  --primary-light: #a78bfa;
+  --primary-soft: #f3e8ff;
+
+  --secondary: #f8a5c2; 
+
+  --background: #faf5ff;
+  --surface: #ffffff;    
+  --surface-hover: #f3e8ff;
+
+  --text: #1f1b1b;          
+  --text-secondary: #000000; 
+  --text-muted: #8b5cf6;    
+  --text-light: #ffffff;   
+
+  --border: #8b5cf6;
+  --divider: #f3e8ff;
+
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --danger: #dc2626;
+  --info: #2563eb;
+
+  --font-family:
+    "Quicksand",
+    "Inter",
+    "Segoe UI",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
+  --font-xs: 0.75rem;
+  --font-sm: 0.875rem;
+  --font-md: 1rem;
+  --font-lg: 1.125rem;
+  --font-xl: 1.5rem;
+  --font-2xl: 2rem;
+  --font-3xl: 3rem;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 4px 14px rgba(124, 58, 237, 0.08);
+  --shadow-md: 0 8px 24px rgba(124, 58, 237, 0.12);
+  --shadow-lg: 0 16px 40px rgba(124, 58, 237, 0.16);
+
+  --container: 1200px;
+
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 5rem;
+
+  --transition-fast: 0.2s ease;
+  --transition: 0.3s ease;
+}
