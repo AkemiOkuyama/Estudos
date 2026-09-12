@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard, Image } from 'react-native';
-import { auth, db } from '../../firebaseConfig';
-import { collection, addDoc, query, where, deleteDoc, doc, onSnapshot, updateDoc, increment } from 'firebase/firestore';
-import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { addDoc, collection, deleteDoc, doc, increment, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { auth, db } from '../../firebaseConfig';
 
 const AparelhoItem = ({ item, onExcluir }: { item: any, onExcluir: (id: string) => void }) => (
   <View style={styles.card}>

@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { auth, db } from '../../firebaseConfig';
 
@@ -12,6 +12,7 @@ export default function DashboardScreen() {
   const router = useRouter();
 
   const TARIFA_KWH = 0.85; 
+
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) {
@@ -23,7 +24,7 @@ export default function DashboardScreen() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       let soma = 0;
       snapshot.forEach((docSnap) => {
-        const item = docSnap.data();
+        const item = docSnap.data() as { potenciaWatts: number; horasPorDia: number };
         soma += (item.potenciaWatts * item.horasPorDia * 30) / 1000;
       });
       setTotalKwh(soma > 0 ? Number(soma.toFixed(1)) : 98.2);
@@ -58,17 +59,17 @@ export default function DashboardScreen() {
       </View>
       
       <View style={styles.menuContainer}>
-        <TouchableOpacity style={styles.botaoMapa} onPress={() => router.push('/mapa')}>
+        <TouchableOpacity style={styles.botaoMapa} onPress={() => router.push('/mapa' as any)}>
           <Ionicons name="map" size={20} color="#fff" />
           <Text style={styles.textoBotaoMapa}>Pontos de Descarte</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/pushNotifications")} style={styles.botaoNotificacao}>
+        <TouchableOpacity onPress={() => router.push('/pushNotifications' as any)} style={styles.botaoNotificacao}>
           <Ionicons name="notifications" size={24} color="#4CAF50" />
         </TouchableOpacity>
       </View>
       
-      {carregando ? (
+      {carregando ? (            
         <View style={[styles.cardResumo, { justifyContent: 'center', alignItems: 'center', height: 120 }]}>
           <ActivityIndicator size="large" color="#4CAF50" />
         </View>
@@ -107,7 +108,7 @@ export default function DashboardScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#121212', padding: 15 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 30 },
   titulo: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginVertical: 10 },
   sair: { color: '#d32f2f', fontWeight: 'bold', padding: 5 },
   menuContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },

@@ -1,0 +1,95 @@
+import { useRouter } from 'expo-router';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { auth, db } from '../firebaseConfig';
+
+export default function RegisterScreen() {
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [role, setRole] = useState<'client' | 'admin'>('client');
+  const [carregando, setCarregando] = useState(false);
+  const router = useRouter();
+
+  const handleRegister = async () => {
+    if (!email || !senha) {
+      Alert.alert('Erro', 'Preencha todos os campos!');
+      return;
+    }
+    if (senha.length < 6) {
+      Alert.alert('Erro', 'A senha precisa ter pelo menos 6 caracteres.');
+      return;
+    }
+
+    setCarregando(true);
+    try {
+      const resultadoAuth = await createUserWithEmailAndPassword(auth, email, senha);
+  
+      await setDoc(doc(db, 'users', resultadoAuth.user.uid), {
+        email: email,
+        role: role, 
+        pontosTotais: 50,
+        criadoEm: new Date()
+      });
+
+      Alert.alert('Sucesso 🎉', 'Conta criada! Você ganhou +50 XP de boas-vindas!', [
+        { 
+          text: 'Entrar', 
+          onPress: () => {
+            if (role === 'admin') {
+              router.replace('/(tabs)/admin'); 
+            } else {
+              router.replace('/(tabs)'); 
+            }
+          } 
+        }
+      ]);
+    } catch (error: any) {
+      console.error("Erro completo:", error);
+      Alert.alert('Erro ao cadastrar', error.message);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.logo}>Criar Conta 🌱</Text>
+
+      <TextInput style={styles.input} placeholder="E-mail" placeholderTextColor="#888" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
+      <TextInput style={styles.input} placeholder="Senha (mín. 6)" placeholderTextColor="#888" secureTextEntry value={senha} onChangeText={setSenha} />
+
+      <View style={styles.roleContainer}>
+        <TouchableOpacity style={[styles.roleBotao, role === 'client' && styles.roleAtivo]} onPress={() => setRole('client')}>
+          <Text style={styles.roleTexto}>Sou Cliente</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.roleBotao, role === 'admin' && styles.roleAtivo]} onPress={() => setRole('admin')}>
+          <Text style={styles.roleTexto}>Sou Admin</Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.botao} onPress={handleRegister} disabled={carregando}>
+        {carregando ? <ActivityIndicator color="#fff" /> : <Text style={styles.botaoTexto}>Cadastrar</Text>}
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => router.replace('/login')} style={styles.link}>
+        <Text style={styles.linkTexto}>Já tem conta? Voltar ao Login</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#121212', justifyContent: 'center', padding: 25 },
+  logo: { fontSize: 32, fontWeight: 'bold', color: '#fff', textAlign: 'center', marginBottom: 30 },
+  input: { backgroundColor: '#1E1E1E', color: '#fff', padding: 15, borderRadius: 8, marginBottom: 15, fontSize: 16 },
+  roleContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
+  roleBotao: { flex: 1, padding: 12, backgroundColor: '#222', borderRadius: 8, marginHorizontal: 5, alignItems: 'center', borderWidth: 1, borderColor: '#333' },
+  roleAtivo: { backgroundColor: '#4CAF50', borderColor: '#4CAF50' },
+  roleTexto: { color: '#fff', fontWeight: 'bold' },
+  botao: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 8, alignItems: 'center', height: 55, justifyContent: 'center' },
+  botaoTexto: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  link: { marginTop: 25 },
+  linkTexto: { color: '#4CAF50', textAlign: 'center', fontSize: 15 }
+});
